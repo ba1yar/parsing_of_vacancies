@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
-items = 20
-url = f"https://hh.ru/search/vacancy?text=Python&from=suggest_post&salary=&clusters=true&area=1&no_magic=true&ored_clusters=true&search_field=name&enable_snippets=true&items_on_page={items}"
+
+ITEMS = 20
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36',
@@ -11,7 +11,7 @@ headers = {
 
 
 # Нахождение номера последней страницы
-def extract_max_page():
+def extract_max_page(url):
     hh_request = requests.get(url, headers=headers)
     hh_soup = BeautifulSoup(hh_request.text, 'html.parser')
 
@@ -34,7 +34,7 @@ def extract_job(html):
     return {'title': title, 'company': company, 'location': location, 'link': link}
 
 
-def extract_jobs(last_page):
+def extract_jobs(last_page, url):
     jobs = []
     for page in range(last_page):
         print(f'Парсинг страницы: {page + 1}')
@@ -49,7 +49,8 @@ def extract_jobs(last_page):
     return jobs
 
 
-def get_jobs():
-    max_page = extract_max_page()
-    jobs = extract_jobs(max_page)
+def get_jobs(keyword):
+    url = f"https://hh.ru/search/vacancy?text={keyword}&from=suggest_post&salary=&clusters=true&area=1&no_magic=true&ored_clusters=true&search_field=name&enable_snippets=true&items_on_page={ITEMS}"
+    max_page = extract_max_page(url)
+    jobs = extract_jobs(max_page, url)
     return jobs
